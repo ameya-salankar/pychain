@@ -6,6 +6,11 @@ from flask import Flask, request
 
 from block import Block
 from chain import Blockchain
+from server_method import Server
+
+server = Server()
+# from server_method import Server
+# from client_method import Client
 
 app = Flask(__name__)
 
@@ -46,6 +51,35 @@ def get_chain():
     return json.dumps(
         {"length": len(chain_data), "chain": chain_data, "peers": list(peers)}
     )
+
+
+@app.route("/recent_block", methods=["GET"])
+def get_block():
+    chain_data = []
+    # for block in blockchain.chain:
+    chain_data.extend(blockchain.chain[-1].transactions)
+    return json.dumps({"block": chain_data})
+
+
+@app.route("/average", methods=["GET"])
+def get_average_weights():
+    models = json.dumps(blockchain.chain[-1]["transactions"][0]["content"])
+    model = server.weights_update(models)
+    post_object = {
+        "author": "client",
+        "content": model,
+    }
+
+    # Submit a transaction
+    new_tx_address = "{}/new_transaction".format("http://127.0.0.1:8000")
+
+    requests.post(
+        new_tx_address,
+        json=json.dumps(post_object),
+        headers={"Content-type": "application/json"},
+    )
+
+    requests.get("{}/mine".format("http://127.0.0.1:8000"))
 
 
 # endpoint to request the node to mine the unconfirmed
