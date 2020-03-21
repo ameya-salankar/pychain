@@ -58,25 +58,30 @@ def get_block():
     chain_data = []
     # for block in blockchain.chain:
     chain_data.extend(blockchain.chain[-1].transactions)
-    return json.dumps({"block": chain_data})
+    return json.dumps({"block": chain_data}), 200
 
 
-@app.route("/average", methods=["GET"])
+# @app.route("/average", methods=["GET"])
 def get_average_weights():
-    models = json.dumps(blockchain.chain[-1]["transactions"][0]["content"])
-    model = server.weights_update(models)
+    # print(blockchain.chain[-1].transactions)
+    print("===============================")
+    models = json.loads(blockchain.chain[-1].transactions[0]["content"])
+    # print(blockchain.chain[-1])
+    modeld = server.weights_update(models)
+    model = []
+    for i in modeld:
+        model.append(i.tolist())
+
     post_object = {
         "author": "client",
-        "content": model,
+        "content": json.dumps(model),
     }
 
     # Submit a transaction
     new_tx_address = "{}/new_transaction".format("http://127.0.0.1:8000")
 
     requests.post(
-        new_tx_address,
-        json=json.dumps(post_object),
-        headers={"Content-type": "application/json"},
+        new_tx_address, json=post_object, headers={"Content-type": "application/json"},
     )
 
     requests.get("{}/mine".format("http://127.0.0.1:8000"))
@@ -147,6 +152,11 @@ def register_with_existing_node():
         return response.content, response.status_code
 
 
+@app.route("/peers", methods=["GET"])
+def return_peers():
+    return json.dumps(peers)
+
+
 def create_chain_from_dump(chain_dump):
     generated_blockchain = Blockchain()
     generated_blockchain.create_genesis_block()
@@ -186,6 +196,8 @@ def verify_and_add_block():
 
     if not added:
         return "The block was discarded by the node", 400
+
+    get_average_weights()
 
     return "Block added to the chain", 201
 

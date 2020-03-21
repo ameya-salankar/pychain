@@ -25,17 +25,27 @@ peers = set()
 @app.route("/new_transaction", methods=["POST"])
 def new_transaction():
     tx_data = request.get_json()
-    required_fields = ["author", "content"]
+    # print(tx_data)
 
-    for field in required_fields:
-        if not tx_data.get(field):
-            return "Invalid transaction data", 404
+    # required_fields = ["author", "content"]
+
+    # for field in required_fields:
+    #     if not tx_data.get(field):
+    #         return "Invalid transaction data", 404
 
     tx_data["timestamp"] = time.time()
 
     blockchain.add_new_transaction(tx_data)
 
     return "Success", 201
+
+
+@app.route("/recent_block", methods=["GET"])
+def get_block():
+    chain_data = []
+    # for block in blockchain.chain:
+    chain_data.extend(blockchain.chain[-1].transactions)
+    return json.dumps({"block": chain_data}), 200
 
 
 # endpoint to return the node's copy of the chain.
@@ -110,10 +120,16 @@ def register_with_existing_node():
         chain_dump = response.json()["chain"]
         blockchain = create_chain_from_dump(chain_dump)
         peers.update(response.json()["peers"])
+        peers.add(node_address + "/")
         return "Registration successful", 200
     else:
         # if something goes wrong, pass it on to the API response
         return response.content, response.status_code
+
+
+@app.route("/peers", methods=["GET"])
+def return_peers():
+    return json.dumps(list(peers))
 
 
 def create_chain_from_dump(chain_dump):
@@ -196,6 +212,7 @@ def announce_new_block(block):
     Other blocks can simply verify the proof of work and add it to their
     respective chains.
     """
+    print()
     for peer in peers:
         url = "{}add_block".format(peer)
         headers = {"Content-Type": "application/json"}
