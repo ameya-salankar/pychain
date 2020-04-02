@@ -154,7 +154,7 @@ def register_with_existing_node():
 
 @app.route("/peers", methods=["GET"])
 def return_peers():
-    return json.dumps(peers)
+    return json.dumps(list(peers))
 
 
 def create_chain_from_dump(chain_dump):
@@ -248,4 +248,4 @@ def announce_new_block(block):
 
 
 # Uncomment this line if you want to specify the port number in the code
-# app.run(debug=True, port=8000)
+app.run(debug=True, port=8000)

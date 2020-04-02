@@ -121,6 +121,7 @@ def register_with_existing_node():
         blockchain = create_chain_from_dump(chain_dump)
         peers.update(response.json()["peers"])
         peers.add(node_address + "/")
+        peers.remove("http://127.0.0.1:8001/")
         return "Registration successful", 200
     else:
         # if something goes wrong, pass it on to the API response
@@ -222,7 +223,7 @@ def announce_new_block(block):
 
 
 # Uncomment this line if you want to specify the port number in the code
-# app.run(debug=True, port=8000)
+app.run(debug=True, port=8001)
 
 
 # client = Client()
