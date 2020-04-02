@@ -1,49 +1,31 @@
-# python_blockchain_app
+# FL with Blockchain
 
-Code from [github.com/satwikkansal](https://github.com/satwikkansal/python_blockchain_app).
-
-Please read the [step-by-step implementation tutorial](https://www.ibm.com/developerworks/cloud/library/cl-develop-blockchain-app-in-python/index.html).
+Blockchain implementation from [github.com/satwikkansal](https://github.com/satwikkansal/python_blockchain_app).
 
 ## Instructions to run
 
 Install the dependencies,
 
 ```sh
-$ cd python_blockchain_app
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-Start a blockchain node server,
+Start the FL server
 
 ```sh
 # Windows users can follow this: https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery
-$ export FLASK_APP=node_server.py
-$ flask run --port 8000
+python3 node_server.py
 ```
 
-One instance of our blockchain node is now up and running at port 8000.
-
-Run the application on a different terminal session,
+Start the FL client
 
 ```sh
-$ python run_app.py
+python3 node_client.py
 ```
 
-The application should be up and running at [http://localhost:5000](http://localhost:5000).
-
-To play around by spinning off multiple custom nodes, use the `register_with/` endpoint to register a new node.
-
-Here's a sample scenario that you might wanna try,
-
-```sh
-# already running
-$ flask run --port 8000 &
-# spinning up new nodes
-$ flask run --port 8001 &
-$ flask run --port 8002 &
-```
-
-You can use the following cURL requests to register the nodes at port `8001` and `8002` with the already running `8000`.
+The server now runs on port `8000` and the client at `8001`.
+<!-- <br> -->
+Register the client with the server using
 
 ```sh
 curl -X POST \
@@ -52,20 +34,13 @@ curl -X POST \
   -d '{"node_address": "http://127.0.0.1:8000"}'
 ```
 
-```sh
-curl -X POST \
-  http://127.0.0.1:8002/register_with \
-  -H 'Content-Type: application/json' \
-  -d '{"node_address": "http://127.0.0.1:8000"}'
-```
+The above step is very important for the blockchain setup. Now the server and the client are the nodes of the blockchain network.
 
-This will make the node at port 8000 aware of the nodes at port 8001 and 8002, and make the newer nodes sync the chain with the node 8000, so that they are able to actively participate in the mining process post registration.
+In a separate terminal, run `python3 client.py`. This will start the training of the model.
 
-To update the node with which the frontend application syncs (default is localhost port 8000), change `CONNECTED_NODE_ADDRESS` field in the [views.py](/app/views.py) file.
-
-Once you do all this, you can run the application, create transactions (post messages via the web inteface), and once you mine the transactions, all the nodes in the network will update the chain. The chain of the nodes can also be inspected by inovking `/chain` endpoint using cURL.
+The chain and the peers of the nodes can be inspected by invoking `/chain` and `/peers` endpoints respectively, using cURL.
 
 ```sh
-$ curl -X GET http://localhost:8001/chain
-$ curl -X GET http://localhost:8002/chain
+curl -X GET http://localhost:8000/chain
+curl -X GET http://localhost:8001/chain
 ```
