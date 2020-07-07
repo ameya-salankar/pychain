@@ -14,7 +14,11 @@ app = Flask(__name__)
 
 # the node's copy of blockchain
 blockchain = Blockchain()
+<<<<<<< HEAD
 # blockchain.create_genesis_block()
+=======
+blockchain.create_genesis_block()
+>>>>>>> 9b704ea2c6a950308e04272dbdc4c57117066d33
 
 # the address to other participating members of the network
 peers = set()
@@ -47,6 +51,7 @@ def get_block():
     chain_data.extend(blockchain.chain[-1].transactions)
     return json.dumps({"block": chain_data}), 200
 
+<<<<<<< HEAD
 @app.route("/last_self_added_block", methods=["GET"])
 def get_last_self_added_block():
     """
@@ -56,6 +61,8 @@ def get_last_self_added_block():
     """
 
     return json.dumps({"block": blockchain.chain[-2].transactions}), 200
+=======
+>>>>>>> 9b704ea2c6a950308e04272dbdc4c57117066d33
 
 # endpoint to return the node's copy of the chain.
 # Our application will be using this endpoint to query

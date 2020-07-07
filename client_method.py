@@ -89,10 +89,15 @@ class Client(object):
         print("Federated model: ")
         self.loss, self.acc = self.final_model.evaluate(self.x_test, self.y_test)
         self.metrics.append(self.acc)
+<<<<<<< HEAD
         """
         self.final_model.set_weights(self.m)
         self.final_model.evaluate(self.x_test, self.y_test)
         """
+=======
+        self.final_model.set_weights(self.m)
+        self.final_model.evaluate(self.x_test, self.y_test)
+>>>>>>> 9b704ea2c6a950308e04272dbdc4c57117066d33
         self.all_weights = []
         for j in range(0, self.SPLIT_SIZE):
             self.all_weights.append(self.models[j].get_weights())
